@@ -1,5 +1,3 @@
-// APP 字符串接收、指令解析、机械臂动作与记忆封装；蓝牙通信由主程序提供。
-// XYZ 调用当前机械臂库；回位不更改 XYZ 原点。
 namespace Acebott {
     export enum ArmAppSide {
         //% block="left"

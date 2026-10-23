@@ -1,9 +1,3 @@
-// AcebottSTC.ts
-// STC8H I2C servo controller driver.
-//
-// The STC firmware accepts a two-byte I2C write:
-//   [channel] [angle]
-// The I2C address is the 7-bit address 0x37.
 
 class AcebottSTC {
     private i2cAddr: number
@@ -33,7 +27,7 @@ class AcebottSTC {
 
 // Mechanical-arm support extracted from AcebottAdvanced.ts and AcebottMicrobit.ts.
 //% color="#0B3D91" weight=100 icon="\uf1b9" block="RobotShield"
-//% groups='["Arm actions", "APP control", "Diagnostics"]'
+//% groups='["Arm actions", "APP control", "Microbit Controller", "Diagnostics"]'
 namespace Acebott {
     function acebottI2cProbe(address: number): boolean {
         // 0x00-0x07 and 0x78-0x7F are reserved 7-bit addresses.
@@ -931,7 +925,7 @@ namespace Acebott {
         let startE = armGetJointAngle(ArmJoint.Elbow)
         let startG = armGetJointAngle(ArmJoint.Claws)
         let delta = Math.max(Math.max(Math.abs(c - startC), Math.abs(s - startS)), Math.max(Math.abs(e - startE), Math.abs(g - startG)))
-        let steps = Math.ceil(delta/2)
+        let steps = Math.ceil(delta / 2)
         // 保留整条路径预检，避免移动到一半才发现限位。
         for (let step = 1; step <= steps; step++) {
             let pc = Math.round(startC + (c - startC) * step / steps)
@@ -1079,5 +1073,80 @@ namespace Acebott {
                 armJointAngles[joint] = angle
             }
         }
+    }
+}
+
+// micro:bit handheld controller. Pin mapping follows the original ACEBOTT controller.
+namespace Acebott {
+    export enum Rocker {
+        //% block="X"
+        X = 0,
+        //% block="Y"
+        Y = 1,
+        //% block="key"
+        Key = 2
+    }
+
+    /** Read X/Y as 0..1023, or joystick press as 1 (pressed) / 0 (released). */
+    //% blockId=joystick block="read joystick value %dir"
+    //% subcategory="RobotShield" group="Microbit Controller" weight=72
+    export function joystick(dir: Rocker): number {
+        if (dir == Rocker.X) {
+            return pins.analogReadPin(AnalogPin.P1)
+        } else if (dir == Rocker.Y) {
+            return pins.analogReadPin(AnalogPin.P2)
+        } else if (dir == Rocker.Key) {
+            pins.setPull(DigitalPin.P8, PinPullMode.PullUp)
+            return pins.digitalReadPin(DigitalPin.P8) == 0 ? 1 : 0
+        }
+        return 0
+    }
+
+    export enum FourKey {
+        //% block="up"
+        Up = 0,
+        //% block="down"
+        Down = 1,
+        //% block="left"
+        Left = 2,
+        //% block="right"
+        Right = 3
+    }
+
+    /** Read the handheld direction key; active-low input with a pull-up resistor. */
+    //% blockId=Four_bit_key block="read the %dir key"
+    //% subcategory="RobotShield" group="Microbit Controller" weight=71
+    export function fourBitKey(dir: FourKey): boolean {
+        let pin: DigitalPin
+        if (dir == FourKey.Up) {
+            pin = DigitalPin.P16
+        } else if (dir == FourKey.Down) {
+            pin = DigitalPin.P14
+        } else if (dir == FourKey.Left) {
+            pin = DigitalPin.P13
+        } else if (dir == FourKey.Right) {
+            pin = DigitalPin.P15
+        } else {
+            return false
+        }
+        pins.setPull(pin, PinPullMode.PullUp)
+        return pins.digitalReadPin(pin) == 0
+    }
+}
+
+namespace Acebott {
+    export enum VibrationMotorCondition {
+        //% block="ON"
+        On = 0,
+        //% block="OFF"
+        Off = 1
+    }
+
+    /** Switch the handheld controller vibration motor on P12. */
+    //% blockId=Vibrating_machine block="vibration %condition"
+    //% condition.defl=Acebott.VibrationMotorCondition.Off
+    //% subcategory="RobotShield" group="Microbit Controller" weight=70
+    export function vibratingMachine(condition: VibrationMotorCondition): void {
+        pins.digitalWritePin(DigitalPin.P12, condition == VibrationMotorCondition.On ? 1 : 0)
     }
 }
