@@ -1,3 +1,5 @@
+// APP 字符串接收、指令解析、机械臂动作与记忆封装；蓝牙通信由主程序提供。
+// XYZ 调用当前机械臂库；回位不更改 XYZ 原点。
 namespace Acebott {
     export enum ArmAppSide {
         //% block="left"
@@ -132,7 +134,7 @@ namespace Acebott {
         appCancelXYZ()
         appClearManual()
         appStopPlayback()
-        // 按底盘、肩部、肘部、夹爪的顺序，每 20 ms 向 90° 移动最多 2°。
+        // 按底盘、肩部、肘部、夹爪的顺序，每隔至少 20 ms 向 90° 移动最多 2°。
         // 新的手动或回放指令可取消回位，避免动作争用。
         appResetStep = 0
         appResetting = true
@@ -170,7 +172,7 @@ namespace Acebott {
                 appReportAngles()
             }
         } else {
-            appResetAt = control.millis() + 20
+            appResetAt = control.millis() + 10
         }
     }
 
