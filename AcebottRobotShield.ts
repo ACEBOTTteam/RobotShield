@@ -1,3 +1,9 @@
+// AcebottSTC.ts
+// STC8H I2C servo controller driver.
+//
+// The STC firmware accepts a two-byte I2C write:
+//   [channel] [angle]
+// The I2C address is the 7-bit address 0x37.
 
 class AcebottSTC {
     private i2cAddr: number
@@ -26,7 +32,7 @@ class AcebottSTC {
 }
 
 // Mechanical-arm support extracted from AcebottAdvanced.ts and AcebottMicrobit.ts.
-//% color="#0B3D91" weight=100 icon="\uf1b9" block="RobotShield"
+//% color="#0B3D91" weight=100 icon="\uf013" block="robot-arm"
 //% groups='["Arm actions", "APP control", "Microbit Controller", "Diagnostics"]'
 namespace Acebott {
     function acebottI2cProbe(address: number): boolean {
@@ -82,7 +88,7 @@ namespace Acebott {
      * Scan all standard usable 7-bit I2C addresses and print responding addresses to serial.
      */
     //% blockId=i2cAddressRead block="I2C address read"
-    //% subcategory="RobotShield" group="Diagnostics"
+    //% subcategory="robot-arm" group="Diagnostics"
     //% weight=100
     //% help=github:acebott/docs/reference
     export function i2cAddressRead(): void {
@@ -107,7 +113,7 @@ namespace Acebott {
     /** Check whether a manually entered hexadecimal 7-bit IIC address acknowledges. */
     //% blockId=i2cAddressCheck block="check IIC address %address"
     //% address.defl="0x37"
-    //% subcategory="RobotShield" group="Diagnostics"
+    //% subcategory="robot-arm" group="Diagnostics"
     //% weight=95
     //% help=github:acebott/docs/reference
     export function i2cAddressCheck(address: string): boolean {
@@ -120,7 +126,7 @@ namespace Acebott {
      */
     //% blockId=stcI2cCheck block="check STC I2C 0x37"
     //% blockHidden=true
-    //% subcategory="RobotShield" group="Diagnostics"
+    //% subcategory="robot-arm" group="Diagnostics"
     //% help=github:acebott/docs/reference
     export function stcI2cCheck(): boolean {
         return acebottI2cProbe(0x37)
@@ -143,7 +149,7 @@ namespace Acebott {
     //% blockHidden=true
     //% channel.min=0 channel.max=5 channel.defl=0
     //% degree.min=0 degree.max=180 degree.defl=90
-    //% subcategory="RobotShield" group="Arm actions"
+    //% subcategory="robot-arm" group="Arm actions"
     //% help=github:acebott/docs/reference
     export function stcServoAngle(channel: number, degree: number): void {
         initSTC()
@@ -512,7 +518,7 @@ namespace Acebott {
     //% shoulder.defl=ArmOutputChannel.STC1
     //% elbow.defl=ArmOutputChannel.STC2
     //% claws.defl=ArmOutputChannel.STC3
-    //% subcategory="RobotShield" group="Arm actions"
+    //% subcategory="robot-arm" group="Arm actions"
     //% weight=100
     //% help=github:acebott/docs/reference
     export function armInitialize(
@@ -531,7 +537,7 @@ namespace Acebott {
     //% blockId=armSetJoint block="set robotic arm %joint|angle %angle|speed %speed"
     //% angle.min=0 angle.max=180 angle.defl=90
     //% speed.min=1 speed.max=100 speed.defl=50
-    //% subcategory="RobotShield" group="Arm actions"
+    //% subcategory="robot-arm" group="Arm actions"
     //% weight=95
     //% help=github:acebott/docs/reference
     export function armSetJoint(joint: ArmJoint, angle: number, speed: number): void {
@@ -561,7 +567,7 @@ namespace Acebott {
     //% elbow.min=0 elbow.max=120 elbow.defl=90
     //% claws.min=90 claws.max=180 claws.defl=90
     //% inlineInputMode=inline
-    //% subcategory="RobotShield" group="Arm actions"
+    //% subcategory="robot-arm" group="Arm actions"
     //% weight=94
     //% help=github:acebott/docs/reference
     export function armSetPose(
@@ -576,7 +582,7 @@ namespace Acebott {
     /** Select joint, claw and home speed; XYZ uses fixed 1-degree / 20-ms steps. */
     //% blockId=armSetSpeed block="set robotic arm speed %speed"
     //% speed.defl=ArmSpeed.Slow
-    //% subcategory="RobotShield" group="Arm actions"
+    //% subcategory="robot-arm" group="Arm actions"
     //% weight=91
     //% help=github:acebott/docs/reference
     export function armSetSpeed(speed: ArmSpeed): void {
@@ -592,7 +598,7 @@ namespace Acebott {
     /** Open to 150 degrees or close to 90 degrees, keeping the other joints still. */
     //% blockId=armClaw block="robotic arm claw %state"
     //% state.defl=ArmClawState.Open
-    //% subcategory="RobotShield" group="Arm actions"
+    //% subcategory="robot-arm" group="Arm actions"
     //% weight=90
     //% help=github:acebott/docs/reference
     export function armClaw(state: ArmClawState): void {
@@ -609,14 +615,14 @@ namespace Acebott {
     /** Legacy alias for armReset; keep old programs working with the same XYZ frame. */
     //% blockId=armHomePose block="robotic arm return to home pose"
     //% blockHidden=true
-    //% subcategory="RobotShield" group="Arm actions"
+    //% subcategory="robot-arm" group="Arm actions"
     export function armHomePose(): void {
         armReset()
     }
 
     /** Reset all four joint angles to 90 degrees without changing the XYZ frame. */
     //% blockId=armReset block="robotic arm angle reset"
-    //% subcategory="RobotShield" group="Arm actions"
+    //% subcategory="robot-arm" group="Arm actions"
     //% weight=93
     //% help=github:acebott/docs/reference
     export function armReset(): void {
@@ -629,7 +635,7 @@ namespace Acebott {
 
     /** Save, run, or delete recorded robotic-arm poses. */
     //% blockId=armMemory block="robotic arm memory %mode"
-    //% subcategory="RobotShield" group="Arm actions"
+    //% subcategory="robot-arm" group="Arm actions"
     //% weight=90
     //% help=github:acebott/docs/reference
     export function armMemory(mode: ArmMemoryMode): void {
@@ -925,7 +931,7 @@ namespace Acebott {
         let startE = armGetJointAngle(ArmJoint.Elbow)
         let startG = armGetJointAngle(ArmJoint.Claws)
         let delta = Math.max(Math.max(Math.abs(c - startC), Math.abs(s - startS)), Math.max(Math.abs(e - startE), Math.abs(g - startG)))
-        let steps = Math.ceil(delta / 2)
+        let steps = Math.ceil(delta/2)
         // 保留整条路径预检，避免移动到一半才发现限位。
         for (let step = 1; step <= steps; step++) {
             let pc = Math.round(startC + (c - startC) * step / steps)
@@ -960,7 +966,7 @@ namespace Acebott {
     //% x.defl=0
     //% y.defl=0
     //% z.defl=0
-    //% subcategory="RobotShield" group="Arm actions"
+    //% subcategory="robot-arm" group="Arm actions"
     //% weight=85
     //% help=github:acebott/docs/reference
     export function armSetPosition(x: number, y: number, z: number): void {
@@ -1040,7 +1046,7 @@ namespace Acebott {
 
     /** Get modeled XYZ in centimeters in the fixed coordinate frame. */
     //% blockId=armGetCoordinate block="get robotic arm coordinate %axis"
-    //% subcategory="RobotShield" group="Arm actions"
+    //% subcategory="robot-arm" group="Arm actions"
     //% weight=80
     //% help=github:acebott/docs/reference
     export function armGetCoordinate(axis: ArmCoordinateAxis): number {
@@ -1050,7 +1056,7 @@ namespace Acebott {
 
     /** Get the current angle of one robotic-arm joint. */
     //% blockId=armGetJointAngle block="get robotic arm %joint angle"
-    //% subcategory="RobotShield" group="Arm actions"
+    //% subcategory="robot-arm" group="Arm actions"
     //% weight=75
     //% help=github:acebott/docs/reference
     export function armGetJointAngle(joint: ArmJoint): number {
@@ -1089,7 +1095,7 @@ namespace Acebott {
 
     /** Read X/Y as 0..1023, or joystick press as 1 (pressed) / 0 (released). */
     //% blockId=joystick block="read joystick value %dir"
-    //% subcategory="RobotShield" group="Microbit Controller" weight=72
+    //% subcategory="robot-arm" group="Microbit Controller" weight=72
     export function joystick(dir: Rocker): number {
         if (dir == Rocker.X) {
             return pins.analogReadPin(AnalogPin.P1)
@@ -1115,7 +1121,7 @@ namespace Acebott {
 
     /** Read the handheld direction key; active-low input with a pull-up resistor. */
     //% blockId=Four_bit_key block="read the %dir key"
-    //% subcategory="RobotShield" group="Microbit Controller" weight=71
+    //% subcategory="robot-arm" group="Microbit Controller" weight=71
     export function fourBitKey(dir: FourKey): boolean {
         let pin: DigitalPin
         if (dir == FourKey.Up) {
@@ -1145,7 +1151,7 @@ namespace Acebott {
     /** Switch the handheld controller vibration motor on P12. */
     //% blockId=Vibrating_machine block="vibration %condition"
     //% condition.defl=Acebott.VibrationMotorCondition.Off
-    //% subcategory="RobotShield" group="Microbit Controller" weight=70
+    //% subcategory="robot-arm" group="Microbit Controller" weight=70
     export function vibratingMachine(condition: VibrationMotorCondition): void {
         pins.digitalWritePin(DigitalPin.P12, condition == VibrationMotorCondition.On ? 1 : 0)
     }

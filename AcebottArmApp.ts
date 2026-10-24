@@ -134,7 +134,7 @@ namespace Acebott {
         appCancelXYZ()
         appClearManual()
         appStopPlayback()
-        // 按底盘、肩部、肘部、夹爪的顺序，每隔至少 20 ms 向 90° 移动最多 2°。
+        // 按底盘、肩部、肘部、夹爪的顺序，每隔至少 50 ms 向 90° 移动最多 1°。
         // 新的手动或回放指令可取消回位，避免动作争用。
         appResetStep = 0
         appResetting = true
@@ -152,7 +152,7 @@ namespace Acebott {
             return
         }
         let current = appAngles[appResetStep]
-        let target = current + Math.constrain(90 - current, -2, 2)
+        let target = current + Math.constrain(90 - current, -1, 1)
         appSetJoint(appResetStep, target)
         // 到位后再复位下一关节；目标被限位拒绝时也前进，最后报告失败。
         if (appAngles[appResetStep] == 90 || appAngles[appResetStep] != target) {
@@ -172,7 +172,7 @@ namespace Acebott {
                 appReportAngles()
             }
         } else {
-            appResetAt = control.millis() + 10
+            appResetAt = control.millis() + 50
         }
     }
 
@@ -210,7 +210,7 @@ namespace Acebott {
 
     /** Convert APP text to three numbers; actual movement uses armSetPosition. */
     //% blockHidden=true
-    //% subcategory="RobotShield"
+    //% subcategory="robot-arm"
     export function armAppParseCoordinates(coordinates: string): number[] {
         let normalized = ""
         for (let index = 0; index < coordinates.length; index++) {
@@ -390,7 +390,7 @@ namespace Acebott {
     //% blockId=acebott_arm_app_result block="when robotic arm reports a result"
     //% blockHidden=true
     //% draggableParameters="reporter"
-    //% subcategory="RobotShield" group="APP control" weight=84
+    //% subcategory="robot-arm" group="APP control" weight=84
     export function onArmAppResult(handler: (message: string) => void): void {
         appMessageHandler = handler
         appResults = []
@@ -398,7 +398,7 @@ namespace Acebott {
 
     /** 读取并移除一条待发送的结果；没有新结果时返回空字符串。 */
     //% blockId=acebott_arm_app_read_result block="send APP command verification"
-    //% subcategory="RobotShield" group="APP control" weight=84
+    //% subcategory="robot-arm" group="APP control" weight=84
     export function armAppReadResult(): string {
         if (appResults.length == 0) {
             return ""
@@ -408,7 +408,7 @@ namespace Acebott {
 
     /** Invalid angle text returns -1 and reports an error. */
     //% blockHidden=true
-    //% subcategory="RobotShield"
+    //% subcategory="robot-arm"
     export function armAppParseAngle(angleText: string): number {
         if (!appNumberValid(angleText, true)) {
             appStatus("UNKNOWN COMMAND")
@@ -437,7 +437,7 @@ namespace Acebott {
 
     /** 设置机械臂动作状态；先使用初始化机械臂积木设置输出通道。 */
     //% blockHidden=true
-    //% subcategory="RobotShield"
+    //% subcategory="robot-arm"
     export function armAppPrepare(): void {
         if (!appStarted) {
             appStarted = true
@@ -461,7 +461,7 @@ namespace Acebott {
 
     /** 开启 APP 的滑块、XYZ、复位和记忆控制；不会自动移动或回位。 */
     //% blockId=acebott_arm_app_open_advanced block="open advanced control on app"
-    //% subcategory="RobotShield" group="APP control" weight=86
+    //% subcategory="robot-arm" group="APP control" weight=86
     export function armAppOpenAdvancedControl(): void {
         appAdvancedEnabled = true
         armAppPrepare()
@@ -471,7 +471,7 @@ namespace Acebott {
     //% blockId=acebott_arm_app_is_pressed block="app %side pad %button button is pressed"
     //% side.defl=Acebott.ArmAppSide.Left
     //% button.defl=Acebott.ArmAppButton.Up
-    //% subcategory="RobotShield" group="APP control" weight=82
+    //% subcategory="robot-arm" group="APP control" weight=82
     export function armAppIsPressed(side: ArmAppSide, button: ArmAppButton): number {
         if (button < ArmAppButton.Up || button > ArmAppButton.Right || button != Math.round(button)) {
             return 0
@@ -543,7 +543,7 @@ namespace Acebott {
     /** 传入保留 # 的蓝牙字符串片段；完整指令依次处理，末尾半条留待下次。 */
     //% blockId=acebott_arm_app_receive block="receive and parse APP data %data"
     //% data.defl="1101#"
-    //% subcategory="RobotShield" group="APP control" weight=85
+    //% subcategory="robot-arm" group="APP control" weight=85
     export function armAppReceive(data: string): void {
         armAppPrepare()
         for (let index = 0; index < data.length; index++) {
@@ -593,7 +593,7 @@ namespace Acebott {
 
     /** 清除待执行的手动输入，停止回放、记录及回位；不清除已保存姿态。 */
     //% blockHidden=true
-    //% subcategory="RobotShield"
+    //% subcategory="robot-arm"
     export function armAppStop(): void {
         appCancelXYZ()
         appClearManual()
@@ -609,7 +609,7 @@ namespace Acebott {
 
     /** 放在重复执行中，每轮推进滑块、坐标、复位或回放；方向键动作由主程序定义。 */
     //% blockHidden=true
-    //% subcategory="RobotShield"
+    //% subcategory="robot-arm"
     export function armAppUpdate(): void {
         if (!appStarted || appUpdating || appXYZExecuting || control.millis() - appLastTick < 20) {
             return
