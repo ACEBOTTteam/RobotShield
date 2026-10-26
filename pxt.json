@@ -1,5 +1,5 @@
 {
-    "name": "robotshield",
+    "name": "acebott-robot-arm",
     "version": "0.0.1",
     "description": "Robotic arm and APP control for BBC micro:bit and RobotShield.",
     "license": "MIT",
